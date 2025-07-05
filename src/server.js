@@ -35,7 +35,6 @@ const init = async () => {
     // mendapatkan konteks response dari request
       const { response } = request;
       console.log(response);
-
       if (response instanceof Error) {
         // penanganan client error secara internal.
         if (response instanceof ClientError) {
@@ -64,8 +63,7 @@ const init = async () => {
       // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
       return h.continue;
     });
-
-
+    
     await server.start();
     console.log(`Server berjalan pada ${server.info.uri}`);
   }
