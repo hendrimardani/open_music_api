@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { rows } = require('pg/lib/defaults');
 
 
 class OpenMusicService {
@@ -26,7 +27,16 @@ class OpenMusicService {
 
   async getAlbumsById({ id }) {
     const query = {
-      text: 'SELECT * FROM albums WHERE id = $1',
+      text: `SELECT
+              albums.id AS albums_id,
+              albums.name AS albums_name,
+              albums.year AS albums_year,
+              songs.id AS songs_id,
+              songs.title AS songs_title,
+              songs.performer AS songs_performer
+            FROM albums
+            LEFT JOIN songs ON albums.id = songs."albumId"
+            WHERE albums.id = $1`,
       values: [id],
     };
     const result = await this._pool.query(query);
@@ -34,7 +44,20 @@ class OpenMusicService {
     if (!result.rows.length) {
       throw new NotFoundError('Data tidak ditemukan');
     }
-    return result.rows[0];
+
+    const isSongsAtributeNull = result.rows[0].songs_id;
+
+    const resultMap = {
+        id: result.rows[0].albums_id,
+        name: result.rows[0].albums_name,
+        year: result.rows[0].albums_year,
+        songs: isSongsAtributeNull === null ? [] : result.rows.map(row => ({
+          id: row.songs_id,
+          title: row.songs_title,
+          performer: row.songs_performer,
+        })),
+      };
+      return resultMap;
   }
 
   async editAlbumsById({ id, name, year }) {
@@ -76,8 +99,24 @@ class OpenMusicService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
-    const result = await this._pool.query('SELECT * FROM songs');
+  async getSongs(title, performer) {
+    let query;
+    if (title === null && performer === null) {
+      query = 'SELECT id, title, performer FROM songs'
+    } else if (title !== null && performer !== null) {
+      query = {
+        text: `SELECT id, title, performer FROM songs WHERE title ILIKE '%' || $1 || '%'
+              AND performer ILIKE '%' || $2 || '%'`,
+        values: [title, performer]
+      }
+    } else {
+      query = {
+        text: `SELECT id, title, performer FROM songs WHERE title ILIKE '%' || $1 || '%'
+              OR performer ILIKE '%' || $2 || '%'`,
+        values: [title, performer]
+      }
+    }
+    const result = await this._pool.query(query);
     return result.rows;
   }
 

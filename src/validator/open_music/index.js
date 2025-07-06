@@ -1,18 +1,20 @@
 const InvariantError = require('../../exceptions/InvariantError');
-const { albumnsSchema, songsSchema } = require('../../validator/open_music/schema');
+const { albumsSchema, songsSchema } = require('../../validator/open_music/schema');
 
 const OpenMusicValidator = {
-  validateAlbumnsPayload: (payload) => {
-    const validationResult = albumnsSchema.validate(payload);
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message);
+  validateAlbumsPayload: (payload) => {
+    const { error, value } = albumsSchema.validate(payload, { abortEarly: false });
+    if (error) {
+      throw new InvariantError(error.details.map((err) => err.message).join(', '));
     }
+    return value;
   },
-  validateAlbumnsPayload: (payload) => {
-    const validationResult = songsSchema.validate(payload);
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message);
+  validateSongsPayload: (payload) => {
+    const { error, value } = songsSchema.validate(payload, { abortEarly: false });
+    if (error) {
+      throw new InvariantError(error.details.map((err) => err.message).join(', '));
     }
+    return value;
   },
 };
 

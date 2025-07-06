@@ -43,7 +43,7 @@ class OpenMusicHandler {
     return response;
   }
 
-  async deleteAlbumsByIdHandler(reuqest) {
+  async deleteAlbumsByIdHandler(reuqest, h) {
     const { id } = reuqest.params;
 
     await this._service.deleteAlbumsById(id);
@@ -69,7 +69,8 @@ class OpenMusicHandler {
   }
 
   async getSongsHandler(request, h) {
-    const songs = await this._service.getSongs();
+    const { title = null, performer = null } = request.query;
+    const songs = await this._service.getSongs(title, performer);
     const response = h.response({
       status: 'success',
       data: {

@@ -9,7 +9,7 @@ export const shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 export const up = (pgm) => {
-    pgm.createTable('songs', {
+  pgm.createTable('songs', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
@@ -37,6 +37,9 @@ export const up = (pgm) => {
     "albumId": {
       type: 'VARCHAR(50)',
       notNull: false,
+      references: 'albums(id)',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   });
 };

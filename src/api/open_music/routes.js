@@ -1,8 +1,23 @@
+const OpenMusicValidator = require("../../validator/open_music");
+
 const routes = (handler) => [
   {
     method: 'POST',
     path: '/albums',
     handler: (request, h) => handler.postAlbumsHandler(request, h),
+    options: {
+      validate: {
+        payload: (value, options) => {
+          return OpenMusicValidator.validateAlbumsPayload(value);
+        },
+        failAction: (request, h, error) => {
+          return h.response({
+            status: 'fail',
+            message: error.details ? error.details.map((err) => err.message) : error.message,
+          }).code(400).takeover();
+        },
+      },
+    },
   },
   {
     method: 'GET',
@@ -13,6 +28,19 @@ const routes = (handler) => [
     method: 'PUT',
     path: '/albums/{id}',
     handler: (request, h) => handler.putAlbumsByIdHandler(request, h),
+    options: {
+      validate: {
+        payload: (value, options) => {
+          return OpenMusicValidator.validateAlbumsPayload(value);
+        },
+        failAction: (request, h, error) => {
+          return h.response({
+            status: 'fail',
+            message: error.details ? error.details.map((err) => err.message) : error.message,
+          }).code(400).takeover();
+        },
+      },
+    },
   },
   {
     method: 'DELETE',
@@ -23,6 +51,19 @@ const routes = (handler) => [
     method: 'POST',
     path: '/songs',
     handler: (request, h) => handler.postSongsHandler(request, h),
+    options: {
+      validate: {
+        payload: (value, options) => {
+          return OpenMusicValidator.validateSongsPayload(value);
+        },
+        failAction: (request, h, error) => {
+          return h.response({
+            status: 'fail',
+            message: error.details ? error.details.map((err) => err.message) : error.message,
+          }).code(400).takeover();
+        },
+      },
+    },
   },
   {
     method: 'GET',
@@ -38,6 +79,19 @@ const routes = (handler) => [
     method: 'PUT',
     path: '/songs/{id}',
     handler: (request, h) => handler.putSongsByIdHandler(request, h),
+    options: {
+      validate: {
+        payload: (value, options) => {
+          return OpenMusicValidator.validateSongsPayload(value);
+        },
+        failAction: (request, h, error) => {
+          return h.response({
+            status: 'fail',
+            message: error.details ? error.details.map((err) => err.message) : error.message,
+          }).code(400).takeover();
+        },
+      },
+    },
   },
   {
     method: 'DELETE',
