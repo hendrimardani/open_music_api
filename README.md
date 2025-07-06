@@ -1,5 +1,4 @@
 # Open Music API versi 1 using Hapi.js Framework
-- Tested pass using postman
 # How to install eslint dicoding-academy style guide
 ## Step 1
 ```bash
